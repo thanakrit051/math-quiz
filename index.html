@@ -82,6 +82,11 @@
             </div>
 
             <div class="mb-6">
+                <!-- Image Container -->
+                <div id="question-image-container" class="mb-5 hidden flex justify-center fade-in">
+                    <img id="question-image" src="" alt="ภาพประกอบโจทย์" class="max-w-full h-auto max-h-48 rounded-lg shadow-sm border border-gray-200" onerror="this.src='https://placehold.co/400x200/f87171/white?text=Image+Not+Found'">
+                </div>
+
                 <h3 id="question-text" class="text-xl sm:text-2xl font-medium leading-relaxed mb-4 text-gray-800"></h3>
                 
                 <!-- Hint Button -->
@@ -102,8 +107,16 @@
                 <p id="feedback-text" class="text-gray-700 mb-2"></p>
             </div>
 
-            <div class="flex justify-end">
-                <button id="next-btn" onclick="nextQuestion()" class="hidden bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+            <div class="flex justify-between items-center mt-4">
+                <div class="flex space-x-2">
+                    <button id="prev-btn" onclick="prevQuestion()" class="hidden text-gray-500 hover:text-gray-800 hover:bg-gray-100 font-medium py-2 px-4 rounded-lg transition duration-300">
+                        <i class="fa-solid fa-backward-step mr-1"></i> ย้อนกลับ
+                    </button>
+                    <button id="skip-btn" onclick="skipQuestion()" class="text-gray-500 hover:text-gray-800 hover:bg-gray-100 font-medium py-2 px-4 rounded-lg transition duration-300">
+                        ข้ามข้อนี้ <i class="fa-solid fa-forward-step ml-1"></i>
+                    </button>
+                </div>
+                <button id="next-btn" onclick="nextQuestion()" class="hidden bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300 ml-auto">
                     ข้อต่อไป <i class="fa-solid fa-angle-right ml-2"></i>
                 </button>
             </div>
@@ -261,14 +274,15 @@
                 hint: "นำตัวที่สนใจ (15) หารด้วยทั้งหมด (60) แล้วคูณ 100"
             },
             {
-                question: "กางเกงตัวหนึ่งราคาป้าย 500 บาท ร้านค้าลดราคา \\(20\\%\\) ผู้ซื้อต้องจ่ายเงินกี่บาท",
+                imageUrl: "https://placehold.co/400x200/ef4444/ffffff?text=SALE+-20%25",
+                question: "กางเกงตัวหนึ่งราคาป้าย 500 บาท ร้านค้าลดราคาตามป้ายที่ปรากฏ ผู้ซื้อต้องจ่ายเงินกี่บาท",
                 options: [
                     { text: "380 บาท", correct: false, rationale: "หักส่วนลดมากเกินไป" },
                     { text: "400 บาท", correct: true, rationale: "ลด \\(20\\%\\) ของ 500 คือ 100 บาท ต้องจ่ายจริง \\(500 - 100 = 400\\) บาท" },
                     { text: "420 บาท", correct: false, rationale: "คิดเลขผิด" },
                     { text: "480 บาท", correct: false, rationale: "เอา 20 ไปลบออกจาก 500 เลย" }
                 ],
-                hint: "หาให้เจอก่อนว่า \\(20\\%\\) ของ 500 บาทคือเงินกี่บาท แล้วนำไปลบออกจากราคาเต็ม"
+                hint: "ดูเปอร์เซ็นต์ลดราคาจากป้าย หาให้เจอก่อนว่าส่วนลดคือเงินกี่บาท แล้วนำไปลบออกจากราคาเต็ม"
             },
             {
                 question: "ซื้อเก้าอี้มาในราคา 400 บาท ขายไปในราคา 480 บาท ได้กำไรกี่เปอร์เซ็นต์",
@@ -283,7 +297,8 @@
 
             // คู่อันดับและกราฟ (16-22)
             {
-                question: "จุดที่เกิดจากการตัดกันของแกน X และแกน Y บนระนาบพิกัดฉาก มีพิกัดตรงกับข้อใด",
+                imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Cartesian-coordinate-system.svg/320px-Cartesian-coordinate-system.svg.png",
+                question: "จากภาพระนาบพิกัดฉาก จุดที่เกิดจากการตัดกันของแกน X และแกน Y มีพิกัดตรงกับข้อใด",
                 options: [
                     { text: "\\((1, 1)\\)", correct: false, rationale: "นี่ไม่ใช่จุดเริ่มต้น" },
                     { text: "\\((0, 1)\\)", correct: false, rationale: "จุดนี้อยู่บนแกน Y" },
@@ -425,7 +440,8 @@
                 hint: "ผ่านไป 1 ชม. ได้ 60 กม., 2 ชม. ได้ 120 กม. เป็นการคูณด้วยอะไร"
             },
             {
-                question: "จากสมการ \\(y = -2x + 10\\) ถ้า \\(x = 3\\) ค่าของ \\(y\\) เท่ากับข้อใด",
+                imageUrl: "https://placehold.co/400x200/3b82f6/ffffff?text=Equation:+y+=-2x+%2B+10",
+                question: "จากภาพสมการ \\(y = -2x + 10\\) ถ้า \\(x = 3\\) ค่าของ \\(y\\) เท่ากับข้อใด",
                 options: [
                     { text: "-4", correct: false, rationale: "บวกลบเลขผิด" },
                     { text: "4", correct: true, rationale: "แทน \\(x=3\\) จะได้ \\(y = -2(3) + 10 = -6 + 10 = 4\\)" },
@@ -437,27 +453,47 @@
         ];
 
         let currentQuestion = 0;
-        let score = 0;
-        let hasAnswered = false;
+        let userAnswers = [];
 
         function startQuiz() {
+            userAnswers = new Array(quizData.length).fill(null);
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('quiz-screen').classList.remove('hidden');
             loadQuestion();
         }
 
+        function calculateScore() {
+            let currentScore = 0;
+            userAnswers.forEach((ans, index) => {
+                if (ans !== null && quizData[index].options[ans].correct) {
+                    currentScore++;
+                }
+            });
+            return currentScore;
+        }
+
         function loadQuestion() {
-            hasAnswered = false;
             const q = quizData[currentQuestion];
             
             // Update trackers
             document.getElementById('question-tracker').innerText = `ข้อ ${currentQuestion + 1} / ${quizData.length}`;
-            document.getElementById('score-tracker').innerText = `คะแนน: ${score}`;
+            document.getElementById('score-tracker').innerText = `คะแนน: ${calculateScore()}`;
             
             // Update progress bar
             const progress = (currentQuestion / quizData.length) * 100;
             document.getElementById('progress-bar').style.width = `${progress}%`;
             
+            // Handle Image display
+            const imgContainer = document.getElementById('question-image-container');
+            const imgElement = document.getElementById('question-image');
+            if (q.imageUrl) {
+                imgElement.src = q.imageUrl;
+                imgContainer.classList.remove('hidden');
+            } else {
+                imgContainer.classList.add('hidden');
+                imgElement.src = '';
+            }
+
             // Set question text
             document.getElementById('question-text').innerHTML = `${currentQuestion + 1}. ${q.question}`;
             
@@ -470,20 +506,45 @@
             const optionsContainer = document.getElementById('options-container');
             optionsContainer.innerHTML = '';
             document.getElementById('feedback-container').classList.add('hidden');
-            document.getElementById('next-btn').classList.add('hidden');
+            
+            const nextBtn = document.getElementById('next-btn');
+            const skipBtn = document.getElementById('skip-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            
+            // Manage Previous Button
+            if (currentQuestion > 0) {
+                prevBtn.classList.remove('hidden');
+            } else {
+                prevBtn.classList.add('hidden');
+            }
 
             // Generate options
             q.options.forEach((opt, index) => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn w-full text-left p-4 border-2 border-gray-200 rounded-xl hover:border-teal-400 hover:bg-teal-50 transition bg-white text-gray-700 font-medium';
+                btn.id = `option-${index}`;
                 btn.innerHTML = `<span class="inline-block w-8 h-8 text-center leading-8 bg-gray-100 rounded-full mr-3 text-sm font-bold text-gray-500">${String.fromCharCode(161 + index)}</span> ${opt.text}`;
-                btn.onclick = () => selectOption(index, btn);
+                btn.onclick = () => selectOption(index);
                 optionsContainer.appendChild(btn);
             });
 
             // Re-render MathJax
             if (window.MathJax) {
                 MathJax.typesetPromise();
+            }
+
+            // Check if already answered
+            if (userAnswers[currentQuestion] !== null) {
+                showAnswerState(userAnswers[currentQuestion]);
+            } else {
+                nextBtn.classList.add('hidden');
+                skipBtn.classList.remove('hidden');
+                
+                if (currentQuestion === quizData.length - 1) {
+                    skipBtn.innerHTML = 'ข้ามและดูผลคะแนน <i class="fa-solid fa-flag-checkered ml-1"></i>';
+                } else {
+                    skipBtn.innerHTML = 'ข้ามข้อนี้ <i class="fa-solid fa-forward-step ml-1"></i>';
+                }
             }
         }
 
@@ -492,18 +553,24 @@
             hintBox.classList.toggle('hidden');
         }
 
-        function selectOption(selectedIndex, selectedBtn) {
-            if (hasAnswered) return;
-            hasAnswered = true;
+        function selectOption(selectedIndex) {
+            if (userAnswers[currentQuestion] !== null) return;
+            userAnswers[currentQuestion] = selectedIndex;
+            
+            document.getElementById('score-tracker').innerText = `คะแนน: ${calculateScore()}`;
+            
+            showAnswerState(selectedIndex);
+        }
 
+        function showAnswerState(selectedIndex) {
             const q = quizData[currentQuestion];
             const isCorrect = q.options[selectedIndex].correct;
-            const buttons = document.querySelectorAll('.option-btn');
 
             // Disable all buttons and show correct/wrong states
-            buttons.forEach((btn, index) => {
+            q.options.forEach((opt, index) => {
+                const btn = document.getElementById(`option-${index}`);
                 btn.disabled = true;
-                if (q.options[index].correct) {
+                if (opt.correct) {
                     btn.classList.add('correct-ans');
                 } else if (index === selectedIndex && !isCorrect) {
                     btn.classList.add('wrong-ans');
@@ -511,10 +578,6 @@
                     btn.classList.add('opacity-50');
                 }
             });
-
-            // Update score
-            if (isCorrect) score++;
-            document.getElementById('score-tracker').innerText = `คะแนน: ${score}`;
 
             // Show feedback
             const feedbackContainer = document.getElementById('feedback-container');
@@ -539,13 +602,29 @@
                 MathJax.typesetPromise([feedbackText]);
             }
 
-            // Show next button
+            // Setup buttons
             const nextBtn = document.getElementById('next-btn');
+            const skipBtn = document.getElementById('skip-btn');
+            
+            skipBtn.classList.add('hidden');
             nextBtn.classList.remove('hidden');
             
-            // Change button text if it's the last question
             if (currentQuestion === quizData.length - 1) {
                 nextBtn.innerHTML = 'ดูผลคะแนน <i class="fa-solid fa-flag-checkered ml-2"></i>';
+            } else {
+                nextBtn.innerHTML = 'ข้อต่อไป <i class="fa-solid fa-angle-right ml-2"></i>';
+            }
+        }
+
+        function skipQuestion() {
+            if (userAnswers[currentQuestion] !== null) return;
+            nextQuestion();
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
             }
         }
 
@@ -565,14 +644,15 @@
             // Set 100% progress
             document.getElementById('progress-bar').style.width = '100%';
             
-            document.getElementById('final-score').innerText = score;
+            const finalScore = calculateScore();
+            document.getElementById('final-score').innerText = finalScore;
             
             const resultMessage = document.getElementById('result-message');
             const resultIcon = document.getElementById('result-icon');
             
             // Calculate percentage
-            const percentage = (score / quizData.length) * 100;
-            
+            const percentage = (finalScore / quizData.length) * 100;
+
             if (percentage >= 80) {
                 resultMessage.innerText = "ยอดเยี่ยมมาก! พื้นฐานคณิตศาสตร์ของคุณแน่นเปรี๊ยะ พร้อมลุยในระดับถัดไป";
                 resultMessage.className = "text-emerald-600 mb-8 text-lg font-medium";
