@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบคณิตศาสตร์ ม.1 เทอม 2</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MathJax for rendering Math equations -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f0fdfa; /* Tailwind teal-50 */
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .correct-ans {
+            background-color: #d1fae5 !important; /* emerald-100 */
+            border-color: #10b981 !important; /* emerald-500 */
+            color: #065f46 !important;
+        }
+        .wrong-ans {
+            background-color: #fee2e2 !important; /* red-100 */
+            border-color: #ef4444 !important; /* red-500 */
+            color: #991b1b !important;
+        }
+    </style>
+</head>
+<body class="text-gray-800 min-h-screen flex items-center justify-center p-4">
+
+    <div id="app" class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden fade-in relative">
+        <!-- Header -->
+        <div class="bg-teal-600 p-6 text-white text-center relative overflow-hidden">
+            <h1 class="text-2xl font-bold relative z-10">แบบทดสอบคณิตศาสตร์ ม.1</h1>
+            <p class="text-teal-100 mt-2 relative z-10">เรื่อง อัตราส่วน ร้อยละ คู่อันดับ และสมการเชิงเส้น</p>
+            <div class="absolute top-0 right-0 p-4 opacity-20">
+                <i class="fa-solid fa-square-root-variable text-6xl"></i>
+            </div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="p-8 text-center">
+            <div class="mb-8 text-teal-600">
+                <i class="fa-solid fa-file-signature text-6xl"></i>
+            </div>
+            <h2 class="text-xl font-semibold mb-4">ข้อสอบปลายภาคเรียน จำนวน 30 ข้อ</h2>
+            <p class="text-gray-600 mb-8">แบบทดสอบนี้มีทั้งหมด 30 ข้อ เลือกคำตอบที่ถูกต้องที่สุดเพียงข้อเดียว ระบบจะทำการตรวจและรวมคะแนนให้คุณเมื่อทำเสร็จสิ้น</p>
+            <button onclick="startQuiz()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg transition duration-300 w-full sm:w-auto">
+                เริ่มทำข้อสอบ <i class="fa-solid fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="p-6 sm:p-8 hidden">
+            <div class="flex justify-between items-center mb-6">
+                <span id="question-tracker" class="text-sm font-semibold text-teal-600 bg-teal-100 py-1 px-3 rounded-full">ข้อ 1 / 30</span>
+                <span id="score-tracker" class="text-sm font-semibold text-gray-500">คะแนน: 0</span>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-6">
+                <div id="progress-bar" class="bg-teal-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <div class="mb-6">
+                <h3 id="question-text" class="text-xl sm:text-2xl font-medium leading-relaxed mb-4 text-gray-800"></h3>
+                
+                <!-- Hint Button -->
+                <button onclick="toggleHint()" id="hint-btn" class="text-amber-500 hover:text-amber-600 text-sm font-medium flex items-center transition mb-4">
+                    <i class="fa-regular fa-lightbulb mr-2"></i> ดูคำใบ้
+                </button>
+                <div id="hint-box" class="hidden bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-lg text-sm mb-6 fade-in">
+                    <!-- Hint text goes here -->
+                </div>
+            </div>
+
+            <div id="options-container" class="space-y-3 mb-8">
+                <!-- Options will be injected here -->
+            </div>
+
+            <div id="feedback-container" class="hidden p-4 rounded-lg mb-6 fade-in border">
+                <div id="feedback-icon" class="text-lg font-bold mb-2 flex items-center"></div>
+                <p id="feedback-text" class="text-gray-700 mb-2"></p>
+            </div>
+
+            <div class="flex justify-end">
+                <button id="next-btn" onclick="nextQuestion()" class="hidden bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                    ข้อต่อไป <i class="fa-solid fa-angle-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="p-8 text-center hidden">
+            <div id="result-icon" class="mb-6 text-6xl"></div>
+            <h2 class="text-3xl font-bold mb-2 text-gray-800">ทำข้อสอบเสร็จแล้ว!</h2>
+            <p class="text-lg text-gray-600 mb-6">คะแนนของคุณคือ</p>
+            <div class="text-5xl font-extrabold text-teal-600 mb-8">
+                <span id="final-score">0</span><span class="text-2xl text-gray-400"> / 30</span>
+            </div>
+            <p id="result-message" class="text-gray-700 mb-8 text-lg font-medium"></p>
+            
+            <button onclick="location.reload()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 w-full sm:w-auto">
+                <i class="fa-solid fa-rotate-right mr-2"></i> ทำข้อสอบอีกครั้ง
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            // อัตราส่วนและสัดส่วน (1-10)
+            {
+                question: "จงหาค่าของ \\(x\\) จากสัดส่วน \\(3 : 5 = x : 20\\)",
+                options: [
+                    { text: "9", correct: false, rationale: "เกิดจากการคูณสัดส่วนผิดพลาด" },
+                    { text: "10", correct: false, rationale: "คูณไขว้ได้ \\(5x = 60\\) แต่หารผิด" },
+                    { text: "12", correct: true, rationale: "จาก \\(\\frac{3}{5} = \\frac{x}{20}\\) นำ 20 ไปคูณ 3 จะได้ 60 หาร 5 เท่ากับ 12" },
+                    { text: "15", correct: false, rationale: "อาจนำเลข 5 ไปคูณ 3" }
+                ],
+                hint: "5 คูณอะไรแล้วได้ 20? ให้นำตัวเลขนั้นไปคูณ 3 ด้วย"
+            },
+            {
+                question: "ถ้าสมุด 4 เล่ม ราคา 60 บาท แล้วสมุด 10 เล่ม จะราคาเท่าไหร่",
+                options: [
+                    { text: "120 บาท", correct: false, rationale: "นี่คือราคาของสมุด 8 เล่ม" },
+                    { text: "140 บาท", correct: false, rationale: "คิดเลขผิดพลาดในขั้นตอนสุดท้าย" },
+                    { text: "150 บาท", correct: true, rationale: "สมุด 1 เล่ม ราคา \\(60 \\div 4 = 15\\) บาท ดังนั้น 10 เล่ม ราคา \\(10 \\times 15 = 150\\) บาท" },
+                    { text: "160 บาท", correct: false, rationale: "คำนวณบัญญัติไตรยางศ์ผิด" }
+                ],
+                hint: "หาสมุด 1 เล่มให้ได้ก่อนว่าราคากี่บาท"
+            },
+            {
+                question: "อัตราส่วนของจำนวนนักเรียนชายต่อนักเรียนหญิงคือ \\(2 : 3\\) ถ้านักเรียนหญิงมี 15 คน นักเรียนชายจะมีกี่คน",
+                options: [
+                    { text: "8 คน", correct: false, rationale: "สัดส่วนยังไม่ถูกต้อง" },
+                    { text: "10 คน", correct: true, rationale: "ชาย/หญิง = 2/3 = x/15 จะได้ \\(3x = 30\\) ดังนั้น \\(x = 10\\)" },
+                    { text: "12 คน", correct: false, rationale: "คูณสัดส่วนผิด" },
+                    { text: "20 คน", correct: false, rationale: "อาจสลับชายกับหญิงกัน" }
+                ],
+                hint: "3 คูณอะไรได้ 15? ให้นำตัวเลขนั้นไปคูณกับ 2"
+            },
+            {
+                question: "จงหาค่า \\(a\\) จากสมการ \\(\\frac{a}{4} = \\frac{24}{32}\\)",
+                options: [
+                    { text: "2", correct: false, rationale: "ยังไม่ใช่คำตอบที่ถูก" },
+                    { text: "3", correct: true, rationale: "นำ 4 ไปคูณ 24 ได้ 96 แล้วหารด้วย 32 จะได้ 3 (หรือทอน \\(\\frac{24}{32}\\) เป็น \\(\\frac{3}{4}\\))" },
+                    { text: "4", correct: false, rationale: "นี่คือตัวส่วน" },
+                    { text: "6", correct: false, rationale: "คำนวณการคูณไขว้ผิดพลาด" }
+                ],
+                hint: "ลองทำเศษส่วน \\(\\frac{24}{32}\\) ให้เป็นเศษส่วนอย่างต่ำก่อน"
+            },
+            {
+                question: "สูตรขนมใช้แป้ง 2 ถ้วย ต่อน้ำตาล 1 ถ้วย ถ้าใช้แป้ง 6 ถ้วย จะต้องใช้น้ำตาลกี่ถ้วย",
+                options: [
+                    { text: "2 ถ้วย", correct: false, rationale: "ยังไม่ใช่สัดส่วนที่ถูกต้อง" },
+                    { text: "3 ถ้วย", correct: true, rationale: "แป้ง 2 น้ำตาล 1 (ครึ่งนึงของแป้ง) ดังนั้นถ้าแป้ง 6 น้ำตาลก็ต้องเป็น 3 ถ้วย" },
+                    { text: "4 ถ้วย", correct: false, rationale: "คำนวณการเพิ่มผิดพลาด" },
+                    { text: "5 ถ้วย", correct: false, rationale: "สัดส่วนไม่ตรง" }
+                ],
+                hint: "น้ำตาลใช้เป็นครึ่งหนึ่งของปริมาณแป้งเสมอ"
+            },
+            {
+                question: "ปากกา 5 ด้าม ราคา 45 บาท ถ้าซื้อ 12 ด้าม ต้องจ่ายเงินกี่บาท",
+                options: [
+                    { text: "90 บาท", correct: false, rationale: "นี่คือราคา 10 ด้าม" },
+                    { text: "108 บาท", correct: true, rationale: "ด้ามละ \\(45 \\div 5 = 9\\) บาท ดังนั้น 12 ด้ามจ่าย \\(12 \\times 9 = 108\\) บาท" },
+                    { text: "112 บาท", correct: false, rationale: "คูณเลขผิดพลาด" },
+                    { text: "120 บาท", correct: false, rationale: "ประมาณการสูงไป" }
+                ],
+                hint: "หาปากกาด้ามละกี่บาทก่อน"
+            },
+            {
+                question: "จงหาค่าของ \\(x\\) จากสัดส่วน \\(2 : 7 = x : 35\\)",
+                options: [
+                    { text: "5", correct: false, rationale: "นี่คือตัวคูณ ไม่ใช่ค่า x" },
+                    { text: "7", correct: false, rationale: "คูณสัดส่วนผิด" },
+                    { text: "10", correct: true, rationale: "7 คูณ 5 ได้ 35 ดังนั้น 2 ก็ต้องคูณ 5 ได้ 10" },
+                    { text: "14", correct: false, rationale: "อาจนำ 7 ไปคูณ 2" }
+                ],
+                hint: "7 คูณกับอะไรจึงจะเท่ากับ 35"
+            },
+            {
+                question: "แผนผังใช้มาตราส่วน \\(1 : 1,000\\) ถ้าระยะในแผนผังคือ 5 เซนติเมตร ระยะทางจริงคือกี่เมตร",
+                options: [
+                    { text: "5 เมตร", correct: false, rationale: "แปลงหน่วยผิด" },
+                    { text: "50 เมตร", correct: true, rationale: "จริงคือ 5,000 ซม. ซึ่ง 100 ซม. = 1 เมตร ดังนั้น 5,000 ซม. = 50 เมตร" },
+                    { text: "500 เมตร", correct: false, rationale: "แปลงหน่วยเซนติเมตรเป็นเมตรผิด" },
+                    { text: "5,000 เมตร", correct: false, rationale: "นี่คือหน่วยเซนติเมตร ไม่ใช่เมตร" }
+                ],
+                hint: "ได้ผลลัพธ์เป็นเซนติเมตรแล้ว อย่าลืมหาร 100 เพื่อแปลงเป็นเมตร"
+            },
+            {
+                question: "แอปเปิล 3 กิโลกรัม ราคา 120 บาท ถ้ามีเงิน 200 บาท จะซื้อแอปเปิลได้กี่กิโลกรัม",
+                options: [
+                    { text: "4 กิโลกรัม", correct: false, rationale: "ใช้เงินไป 160 บาท" },
+                    { text: "5 กิโลกรัม", correct: true, rationale: "แอปเปิลกิโลกรัมละ \\(120 \\div 3 = 40\\) บาท เงิน 200 บาท ซื้อได้ \\(200 \\div 40 = 5\\) กิโลกรัม" },
+                    { text: "6 กิโลกรัม", correct: false, rationale: "ใช้เงิน 240 บาท" },
+                    { text: "7 กิโลกรัม", correct: false, rationale: "คำนวณผิดพลาด" }
+                ],
+                hint: "กิโลกรัมละกี่บาท เอาราคาต่อกิโลกรัมไปหาร 200"
+            },
+            {
+                question: "จงหาค่า \\(x\\) จากสัดส่วน \\(7 : 11 = 21 : x\\)",
+                options: [
+                    { text: "22", correct: false, rationale: "คูณสัดส่วนผิด" },
+                    { text: "30", correct: false, rationale: "กะประมาณตัวเลข" },
+                    { text: "33", correct: true, rationale: "7 คูณ 3 ได้ 21 ดังนั้น 11 ต้องคูณ 3 ได้ 33" },
+                    { text: "44", correct: false, rationale: "อาจนำ 11 ไปคูณ 4" }
+                ],
+                hint: "จาก 7 เป็น 21 เพิ่มขึ้นกี่เท่า"
+            },
+
+            // ร้อยละและเปอร์เซ็นต์ (11-15)
+            {
+                question: "ข้อใดมีค่าเท่ากับ \\(45\\%\\)",
+                options: [
+                    { text: "0.045", correct: false, rationale: "ทศนิยมผิดตำแหน่ง" },
+                    { text: "\\(0.45\\)", correct: true, rationale: "\\(45\\% = \\frac{45}{100} = 0.45\\)" },
+                    { text: "\\(4.5\\)", correct: false, rationale: "ทศนิยมผิดตำแหน่ง" },
+                    { text: "45", correct: false, rationale: "นี่คือจำนวนเต็มร้อยเปอร์เซ็นต์" }
+                ],
+                hint: "เปอร์เซ็นต์คือการหารด้วย 100"
+            },
+            {
+                question: "\\(30\\%\\) ของ 400 มีค่าเท่ากับข้อใด",
+                options: [
+                    { text: "90", correct: false, rationale: "นี่คือ \\(30\\%\\) ของ 300" },
+                    { text: "120", correct: true, rationale: "\\(\\frac{30}{100} \\times 400 = 30 \\times 4 = 120\\)" },
+                    { text: "150", correct: false, rationale: "คำนวณผิดพลาด" },
+                    { text: "200", correct: false, rationale: "นี่คือ \\(50\\%\\)" }
+                ],
+                hint: "นำ \\(\\frac{30}{100}\\) ไปคูณกับ 400"
+            },
+            {
+                question: "9 คิดเป็นกี่เปอร์เซ็นต์ของ 36",
+                options: [
+                    { text: "\\(20\\%\\)", correct: false, rationale: "คำนวณเศษส่วนผิด" },
+                    { text: "\\(25\\%\\)", correct: true, rationale: "\\(\\frac{9}{36} \\times 100 = \\frac{1}{4} \\times 100 = 25\\%\\)" },
+                    { text: "\\(30\\%\\)", correct: false, rationale: "ยังไม่ถูกต้อง" },
+                    { text: "\\(45\\%\\)", correct: false, rationale: "อาจนำเลขมาทำอะไรกันผิดขั้นตอน" }
+                ],
+                hint: "นำตัวที่สนใจหารด้วยทั้งหมด แล้วคูณ 100"
+            },
+            {
+                question: "เสื้อตัวหนึ่งราคาป้าย 300 บาท ร้านค้าลดราคา \\(10\\%\\) ผู้ซื้อต้องจ่ายเงินกี่บาท",
+                options: [
+                    { text: "30 บาท", correct: false, rationale: "นี่คือส่วนลด ไม่ใช่ราคาที่ต้องจ่าย" },
+                    { text: "270 บาท", correct: true, rationale: "ลด \\(10\\%\\) ของ 300 คือ 30 บาท ต้องจ่ายจริง \\(300 - 30 = 270\\) บาท" },
+                    { text: "290 บาท", correct: false, rationale: "เอา 10 ไปลบออกจาก 300 เลย" },
+                    { text: "330 บาท", correct: false, rationale: "นี่คือการบวกเพิ่ม" }
+                ],
+                hint: "หาให้เจอก่อนว่า \\(10\\%\\) ของ 300 บาทคือเงินกี่บาท"
+            },
+            {
+                question: "ซื้อของมาในราคา 200 บาท ขายไปในราคา 250 บาท ได้กำไรกี่เปอร์เซ็นต์",
+                options: [
+                    { text: "\\(20\\%\\)", correct: false, rationale: "นำกำไรไปหารด้วยราคาขายแทนที่จะเป็นต้นทุน" },
+                    { text: "\\(25\\%\\)", correct: true, rationale: "กำไร 50 บาท คิดจากต้นทุน 200 บาท: \\(\\frac{50}{200} \\times 100 = 25\\%\\)" },
+                    { text: "\\(50\\%\\)", correct: false, rationale: "เอาเลข 50 มาตอบเลยโดยไม่คิดเปอร์เซ็นต์" },
+                    { text: "\\(125\\%\\)", correct: false, rationale: "คิดเป็นเปอร์เซ็นต์ของราคาขายต่อราคาทุน ไม่ใช่กำไร" }
+                ],
+                hint: "กำไรกี่บาท? แล้วนำกำไรนั้นไปหารด้วย 'ต้นทุน'"
+            },
+
+            // คู่อันดับและกราฟ (16-22)
+            {
+                question: "จุดกำเนิด (Origin) บนระนาบพิกัดฉาก มีพิกัดตรงกับข้อใด",
+                options: [
+                    { text: "\\((1, 1)\\)", correct: false, rationale: "จุดกำเนิดต้องเป็นจุดเริ่มต้นของแกนทั้งสอง" },
+                    { text: "\\((0, 1)\\)", correct: false, rationale: "จุดนี้อยู่บนแกน Y" },
+                    { text: "\\((1, 0)\\)", correct: false, rationale: "จุดนี้อยู่บนแกน X" },
+                    { text: "\\((0, 0)\\)", correct: true, rationale: "จุดกำเนิดคือจุดตัดของแกน X และ Y มีพิกัด \\((0, 0)\\)" }
+                ],
+                hint: "จุดที่แกนแนวตั้งและแนวนอนตัดกัน ค่าจะเป็นศูนย์ทั้งคู่"
+            },
+            {
+                question: "จุดที่อยู่ใน 'จตุภาคที่ 1' จะมีลักษณะพิกัด \\((x, y)\\) อย่างไร",
+                options: [
+                    { text: "\\(x\\) เป็นบวก, \\(y\\) เป็นบวก", correct: true, rationale: "จตุภาคที่ 1 อยู่ขวาบน ค่า X และ Y เป็นบวกทั้งคู่" },
+                    { text: "\\(x\\) เป็นลบ, \\(y\\) เป็นบวก", correct: false, rationale: "นี่คือจตุภาคที่ 2" },
+                    { text: "\\(x\\) เป็นลบ, \\(y\\) เป็นลบ", correct: false, rationale: "นี่คือจตุภาคที่ 3" },
+                    { text: "\\(x\\) เป็นบวก, \\(y\\) เป็นลบ", correct: false, rationale: "นี่คือจตุภาคที่ 4" }
+                ],
+                hint: "พื้นที่ด้านบนขวาของกราฟ ค่าไปทางขวาและขึ้นข้างบน"
+            },
+            {
+                question: "จุด \\((-3, 7)\\) อยู่ในจตุภาคใด",
+                options: [
+                    { text: "จตุภาคที่ 1", correct: false, rationale: "X และ Y ต้องเป็นบวกทั้งคู่" },
+                    { text: "จตุภาคที่ 2", correct: true, rationale: "ค่า X เป็นลบ ค่า Y เป็นบวก ตกในจตุภาคที่ 2" },
+                    { text: "จตุภาคที่ 3", correct: false, rationale: "X และ Y ต้องเป็นลบทั้งคู่" },
+                    { text: "จตุภาคที่ 4", correct: false, rationale: "X เป็นบวก Y เป็นลบ" }
+                ],
+                hint: "X เป็นลบหมายถึงไปทางซ้าย Y เป็นบวกหมายถึงขึ้นข้างบน"
+            },
+            {
+                question: "จุด \\((-4, -2)\\) อยู่ในจตุภาคใด",
+                options: [
+                    { text: "จตุภาคที่ 1", correct: false, rationale: "X และ Y ต้องเป็นบวกทั้งคู่" },
+                    { text: "จตุภาคที่ 2", correct: false, rationale: "X เป็นลบ Y เป็นบวก" },
+                    { text: "จตุภาคที่ 3", correct: true, rationale: "ค่า X เป็นลบ และค่า Y เป็นลบ ตกในจตุภาคที่ 3" },
+                    { text: "จตุภาคที่ 4", correct: false, rationale: "X เป็นบวก Y เป็นลบ" }
+                ],
+                hint: "X ติดลบ(ซ้าย) Y ติดลบ(ลงล่าง)"
+            },
+            {
+                question: "พิกัดของจุดที่อยู่ห่างจากแกน Y ไปทางซ้าย 4 หน่วย และอยู่ต่ำกว่าแกน X ลงมา 2 หน่วย คือข้อใด",
+                options: [
+                    { text: "\\((4, -2)\\)", correct: false, rationale: "นี่คือไปทางขวา ไม่ใช่ทางซ้าย" },
+                    { text: "\\((-4, 2)\\)", correct: false, rationale: "นี่คืออยู่เหนือแกน X ไม่ใช่ต่ำกว่า" },
+                    { text: "\\((-4, -2)\\)", correct: true, rationale: "ซ้าย 4 หน่วยคือ \\(x=-4\\) ต่ำ 2 หน่วยคือ \\(y=-2\\) ได้พิกัด \\((-4, -2)\\)" },
+                    { text: "\\((4, 2)\\)", correct: false, rationale: "ไปทางขวาและขึ้นบน" }
+                ],
+                hint: "ทางซ้ายของแกน Y ค่า x ติดลบ ต่ำกว่าแกน X ค่า y ติดลบ"
+            },
+            {
+                question: "พิกัดของจุดที่อยู่ห่างจากแกน Y ไปทางขวา 5 หน่วย และอยู่เหนือแกน X ขึ้นไป 1 หน่วย คือข้อใด",
+                options: [
+                    { text: "\\((5, 1)\\)", correct: true, rationale: "ขวา 5 หน่วยคือ \\(x=5\\) เหนือ 1 หน่วยคือ \\(y=1\\) ได้พิกัด \\((5, 1)\\)" },
+                    { text: "\\((-5, 1)\\)", correct: false, rationale: "นี่คือไปทางซ้าย" },
+                    { text: "\\((5, -1)\\)", correct: false, rationale: "นี่คืออยู่ต่ำกว่าแกน X" },
+                    { text: "\\((-5, -1)\\)", correct: false, rationale: "ซ้ายและลงล่าง" }
+                ],
+                hint: "ขวาเป็นบวก บนเป็นบวก"
+            },
+            {
+                question: "จุดพิกัดใดๆ ที่อยู่บนแกน X จะมีค่าอะไรเป็นศูนย์เสมอ",
+                options: [
+                    { text: "ค่า \\(x\\)", correct: false, rationale: "จุดบนแกน X จะมีระยะบนแกน X เป็นตัวเลขใดๆ ก็ได้" },
+                    { text: "ค่า \\(y\\)", correct: true, rationale: "จุดที่ทาบอยู่บนเส้นแนวนอน (แกน X) จะไม่มีการเลื่อนขึ้นหรือลง ทำให้ค่า \\(y=0\\) เสมอ" },
+                    { text: "ทั้งค่า \\(x\\) และ \\(y\\)", correct: false, rationale: "นั่นคือจุดกำเนิดจุดเดียวเท่านั้น" },
+                    { text: "ไม่มีค่าใดเป็นศูนย์", correct: false, rationale: "ผิดหลักการของพิกัดแกน" }
+                ],
+                hint: "ถ้าจุดไม่ลอยขึ้นและไม่มุดลงใต้เส้นแนวนอน ค่าแนวตั้งจะเป็นอะไร"
+            },
+
+            // สมการเชิงเส้นสองตัวแปร (23-30)
+            {
+                question: "ร้านขายสมุดราคาเล่มละ 15 บาท ความสัมพันธ์ระหว่าง 'จำนวนสมุด \\(x\\)' กับ 'ราคา \\(y\\)' เขียนเป็นสมการได้อย่างไร",
+                options: [
+                    { text: "\\(y = x + 15\\)", correct: false, rationale: "นี่คือสมุดราคา 15 บาทบวกด้วยจำนวนเล่ม ซึ่งไม่สมเหตุสมผล" },
+                    { text: "\\(x = 15y\\)", correct: false, rationale: "สมการสลับตัวแปรกัน" },
+                    { text: "\\(y = 15x\\)", correct: true, rationale: "ราคารวม \\(y\\) หาได้จาก ราคาต่อเล่ม 15 คูณจำนวนเล่ม \\(x\\)" },
+                    { text: "\\(y = \\frac{15}{x}\\)", correct: false, rationale: "นี่คือการหาร ไม่ใช่การคูณ" }
+                ],
+                hint: "ถ้ายิ่งซื้อเยอะ จำนวนเงินยิ่งทวีคูณ ต้องใช้เครื่องหมายอะไร"
+            },
+            {
+                question: "จากสมการเชิงเส้น \\(y = 2x + 5\\) ถ้ากำหนดให้ \\(x = 3\\) แล้ว \\(y\\) จะมีค่าเท่าใด",
+                options: [
+                    { text: "8", correct: false, rationale: "ลืมคูณ 2" },
+                    { text: "10", correct: false, rationale: "คิดเลขผิด" },
+                    { text: "11", correct: true, rationale: "แทน \\(x=3\\) จะได้ \\(y = 2(3) + 5 = 6 + 5 = 11\\)" },
+                    { text: "13", correct: false, rationale: "แทนค่าผิด" }
+                ],
+                hint: "แทนเลข 3 เข้าไปตรงตัวอักษร \\(x\\) ทำการคูณก่อนบวก"
+            },
+            {
+                question: "กราฟของสมการ \\(y = x - 4\\) จะตัดแกน Y ที่พิกัดใด",
+                options: [
+                    { text: "\\((0, 4)\\)", correct: false, rationale: "เครื่องหมายผิด" },
+                    { text: "\\((0, -4)\\)", correct: true, rationale: "จุดตัดแกน Y ให้ \\(x=0\\) ดังนั้น \\(y = 0 - 4 = -4\\) พิกัดคือ \\((0, -4)\\)" },
+                    { text: "\\((4, 0)\\)", correct: false, rationale: "นี่คือจุดตัดแกน X" },
+                    { text: "\\((-4, 0)\\)", correct: false, rationale: "แทนค่าสลับตัวแปร" }
+                ],
+                hint: "จุดที่ตัดแกน Y เสมอ จะมีค่า \\(x = 0\\)"
+            },
+            {
+                question: "จากสมการ \\(y = 3x\\) ถ้า \\(y = 12\\) ค่าของ \\(x\\) คือข้อใด",
+                options: [
+                    { text: "3", correct: false, rationale: "คูณ 3 ได้แค่ 9" },
+                    { text: "4", correct: true, rationale: "แทน \\(y=12\\) จะได้ \\(12 = 3x\\) ดังนั้น \\(x = 12 \\div 3 = 4\\)" },
+                    { text: "9", correct: false, rationale: "นำไปลบแทนการหาร" },
+                    { text: "36", correct: false, rationale: "นำไปคูณแทนที่จะแก้สมการหาร" }
+                ],
+                hint: "3 คูณอะไรแล้วได้ 12"
+            },
+            {
+                question: "กราฟของสมการ \\(y = x + 2\\) จะตัดแกน X ที่พิกัดใด",
+                options: [
+                    { text: "\\((0, 2)\\)", correct: false, rationale: "นี่คือจุดตัดแกน Y" },
+                    { text: "\\((2, 0)\\)", correct: false, rationale: "เครื่องหมายผิด" },
+                    { text: "\\((-2, 0)\\)", correct: true, rationale: "จุดตัดแกน X ให้ \\(y=0\\) จะได้ \\(0 = x + 2\\) ย้ายข้าง \\(x = -2\\) พิกัดคือ \\((-2, 0)\\)" },
+                    { text: "\\((0, -2)\\)", correct: false, rationale: "แทนค่าสลับกัน" }
+                ],
+                hint: "จุดที่ตัดแกน X เสมอ จะมีค่า \\(y = 0\\) ย้ายข้างสมการดีๆ"
+            },
+            {
+                question: "พิกัดคู่อันดับในข้อใด ที่จุดอยู่บนเส้นกราฟสมการ \\(y = 2x\\)",
+                options: [
+                    { text: "\\((2, 2)\\)", correct: false, rationale: "แทน \\(x=2\\) จะได้ \\(y=4\\)" },
+                    { text: "\\((2, 4)\\)", correct: true, rationale: "เมื่อแทน \\(x=2\\) ลงใน \\(y=2x\\) จะได้ \\(y = 2(2) = 4\\) ซึ่งเป็นจริง" },
+                    { text: "\\((4, 2)\\)", correct: false, rationale: "แทนสลับกัน" },
+                    { text: "\\((3, 5)\\)", correct: false, rationale: "แทน \\(x=3\\) ต้องได้ \\(y=6\\)" }
+                ],
+                hint: "ลองนำตัวเลขตัวหน้า (x) คูณ 2 ดูสิว่าเท่ากับตัวหลัง (y) ในข้อใด"
+            },
+            {
+                question: "น้ำไหลออกจากท่อในอัตรา 2 ลิตรต่อนาที ถ้าน้ำไหลออกจำนวน \\(y\\) ลิตร ในเวลา \\(x\\) นาที เขียนเป็นสมการได้อย่างไร",
+                options: [
+                    { text: "\\(y = x + 2\\)", correct: false, rationale: "การเพิ่มขึ้นคงที่เป็นพหุคูณ ไม่ใช่การบวก" },
+                    { text: "\\(y = \\frac{x}{2}\\)", correct: false, rationale: "สมการผิดทิศทาง" },
+                    { text: "\\(y = 2x\\)", correct: true, rationale: "ปริมาณน้ำรวม = อัตราการไหลต่อนาที \\(\\times\\) เวลา" },
+                    { text: "\\(x = 2y\\)", correct: false, rationale: "สลับตัวแปรกัน" }
+                ],
+                hint: "ผ่านไป 1 นาทีได้ 2 ลิตร, 2 นาทีได้ 4 ลิตร เป็นการคูณด้วยอะไร"
+            },
+            {
+                question: "จากสมการ \\(y = -x + 5\\) ถ้า \\(x = 2\\) ค่าของ \\(y\\) เท่ากับข้อใด",
+                options: [
+                    { text: "3", correct: true, rationale: "แทน \\(x=2\\) จะได้ \\(y = -(2) + 5 = 3\\)" },
+                    { text: "7", correct: false, rationale: "ลืมเครื่องหมายลบหน้า x ทำให้เป็น 2+5" },
+                    { text: "-3", correct: false, rationale: "บวกลบเลขผิด" },
+                    { text: "-7", correct: false, rationale: "บวกลบเลขผิด" }
+                ],
+                hint: "ระวังเครื่องหมายลบหน้าตัว \\(x\\) ให้ดี นำลบไปแปะหน้าเลข 2 ก่อนนำไปบวก"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let hasAnswered = false;
+
+        function startQuiz() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            hasAnswered = false;
+            const q = quizData[currentQuestion];
+            
+            // Update trackers
+            document.getElementById('question-tracker').innerText = `ข้อ ${currentQuestion + 1} / ${quizData.length}`;
+            document.getElementById('score-tracker').innerText = `คะแนน: ${score}`;
+            
+            // Update progress bar
+            const progress = (currentQuestion / quizData.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            
+            // Set question text
+            document.getElementById('question-text').innerHTML = `${currentQuestion + 1}. ${q.question}`;
+            
+            // Reset hint
+            const hintBox = document.getElementById('hint-box');
+            hintBox.classList.add('hidden');
+            hintBox.innerHTML = `<i class="fa-solid fa-circle-info mr-2"></i> ${q.hint}`;
+            
+            // Clear previous options and feedback
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            document.getElementById('feedback-container').classList.add('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+
+            // Generate options
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-4 border-2 border-gray-200 rounded-xl hover:border-teal-400 hover:bg-teal-50 transition bg-white text-gray-700 font-medium';
+                btn.innerHTML = `<span class="inline-block w-8 h-8 text-center leading-8 bg-gray-100 rounded-full mr-3 text-sm font-bold text-gray-500">${String.fromCharCode(161 + index)}</span> ${opt.text}`;
+                btn.onclick = () => selectOption(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Re-render MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function toggleHint() {
+            const hintBox = document.getElementById('hint-box');
+            hintBox.classList.toggle('hidden');
+        }
+
+        function selectOption(selectedIndex, selectedBtn) {
+            if (hasAnswered) return;
+            hasAnswered = true;
+
+            const q = quizData[currentQuestion];
+            const isCorrect = q.options[selectedIndex].correct;
+            const buttons = document.querySelectorAll('.option-btn');
+
+            // Disable all buttons and show correct/wrong states
+            buttons.forEach((btn, index) => {
+                btn.disabled = true;
+                if (q.options[index].correct) {
+                    btn.classList.add('correct-ans');
+                } else if (index === selectedIndex && !isCorrect) {
+                    btn.classList.add('wrong-ans');
+                } else {
+                    btn.classList.add('opacity-50');
+                }
+            });
+
+            // Update score
+            if (isCorrect) score++;
+            document.getElementById('score-tracker').innerText = `คะแนน: ${score}`;
+
+            // Show feedback
+            const feedbackContainer = document.getElementById('feedback-container');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackText = document.getElementById('feedback-text');
+            
+            feedbackContainer.classList.remove('hidden');
+            if (isCorrect) {
+                feedbackContainer.className = 'p-4 rounded-lg mb-6 fade-in border bg-emerald-50 border-emerald-200 relative';
+                feedbackIcon.className = 'text-lg font-bold mb-2 flex items-center text-emerald-600';
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> ถูกต้อง!';
+            } else {
+                feedbackContainer.className = 'p-4 rounded-lg mb-6 fade-in border bg-red-50 border-red-200 relative';
+                feedbackIcon.className = 'text-lg font-bold mb-2 flex items-center text-red-600';
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-circle-xmark mr-2"></i> ยังไม่ถูกครับ';
+            }
+            
+            feedbackText.innerHTML = q.options[selectedIndex].rationale;
+            
+            // Re-render MathJax in feedback
+            if (window.MathJax) {
+                MathJax.typesetPromise([feedbackText]);
+            }
+
+            // Show next button
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.classList.remove('hidden');
+            
+            // Change button text if it's the last question
+            if (currentQuestion === quizData.length - 1) {
+                nextBtn.innerHTML = 'ดูผลคะแนน <i class="fa-solid fa-flag-checkered ml-2"></i>';
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            
+            // Set 100% progress
+            document.getElementById('progress-bar').style.width = '100%';
+            
+            document.getElementById('final-score').innerText = score;
+            
+            const resultMessage = document.getElementById('result-message');
+            const resultIcon = document.getElementById('result-icon');
+            
+            // Calculate percentage
+            const percentage = (score / quizData.length) * 100;
+            
+            if (percentage >= 80) {
+                resultMessage.innerText = "ยอดเยี่ยมมาก! พื้นฐานคณิตศาสตร์ของคุณแน่นเปรี๊ยะ พร้อมลุยในระดับถัดไป";
+                resultMessage.className = "text-emerald-600 mb-8 text-lg font-medium";
+                resultIcon.innerHTML = '<i class="fa-solid fa-trophy text-yellow-400 drop-shadow-lg"></i>';
+            } else if (percentage >= 60) {
+                resultMessage.innerText = "ทำได้ดีมากครับ! ผ่านเกณฑ์สบายๆ ลองทบทวนอีกนิดจะได้คะแนนเต็มนะ";
+                resultMessage.className = "text-blue-600 mb-8 text-lg font-medium";
+                resultIcon.innerHTML = '<i class="fa-regular fa-face-smile-beam text-blue-500"></i>';
+            } else if (percentage >= 50) {
+                resultMessage.innerText = "ผ่านเกณฑ์พอดีครับ! ถือว่ามีพื้นฐานอยู่บ้าง แต่ควรฝึกทำโจทย์บ่อยๆ นะ";
+                resultMessage.className = "text-amber-600 mb-8 text-lg font-medium";
+                resultIcon.innerHTML = '<i class="fa-solid fa-thumbs-up text-amber-500"></i>';
+            } else {
+                resultMessage.innerText = "พยายามเข้านะครับ! ข้อสอบอาจจะยากไปนิด ลองกลับไปทบทวนเนื้อหาแล้วมาสู้ใหม่นะ";
+                resultMessage.className = "text-red-500 mb-8 text-lg font-medium";
+                resultIcon.innerHTML = '<i class="fa-solid fa-book-open text-red-400"></i>';
+            }
+        }
+    </script>
+</body>
+</html>
